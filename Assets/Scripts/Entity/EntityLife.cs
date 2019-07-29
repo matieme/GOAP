@@ -14,7 +14,7 @@ public class EntityLife : MonoBehaviour
     }
 
     [SerializeField] protected float _life;
-    public int ammo;
+    public int battery;
     protected float _lifeMax;
     protected bool _isDeath;
 
@@ -36,9 +36,9 @@ public class EntityLife : MonoBehaviour
         Life += ammountHealed;
     }
 
-    public virtual void ReplenishAmmo(int ammoAmount)
+    public virtual void ReplenishBattery(int batteryChargeAmount)
     {
-        ammo += ammoAmount;
+        battery += batteryChargeAmount;
     }
 
     public virtual void Destroyed()

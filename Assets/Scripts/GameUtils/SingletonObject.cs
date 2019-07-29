@@ -19,7 +19,6 @@ namespace GameUtils
                         Debug.LogError("An instance of " + typeof(T) + " is needed in the scene, but there is none.");
                     }
                 }
-
                 return instance;
             }
         }

@@ -10,7 +10,6 @@ public class ZombunnyEnemy : EntityMovement
 {
     public GameObject shootParticle;
     public GameObject barrel;
-    public WeaponType weapon;
     public bool isWeaponLoaded;
     public float rushingSpeed;
     public float rotationSpeed;
@@ -19,13 +18,13 @@ public class ZombunnyEnemy : EntityMovement
     public float shootDistance;
     public float pickUpDistance;
     public int clipSize;
-    public LayerMask ammoLayerMask;
+    public LayerMask batteryLayerMask;
     public LayerMask mediKitLayerMask;
 
     private Queue<string> _queueActions = new Queue<string>();
     private Transform _target;
     private Transform _player;
-    private Transform _closestAmmoBox;
+    private Transform _closestBattery;
     private Transform _closestMediKit;
     private Animator _anim;
     private bool _finishAnimation;
@@ -55,10 +54,10 @@ public class ZombunnyEnemy : EntityMovement
 
         _availableActions.Add(
             new GOAPAction(GOAPActionKeyEnum.Shoot)
-                .SetPrecondition(GOAPKeyEnum.hasFireWeapon, x => (bool)x == true)
+                //.SetPrecondition(GOAPKeyEnum.hasFireWeapon, x => (bool)x == true)
                 .SetPrecondition(GOAPKeyEnum.isWeaponLoaded, x => (bool)x == true)
                 .SetPrecondition(GOAPKeyEnum.isInWeaponRange, x => (bool)x == true)
-                .SetPrecondition(GOAPKeyEnum.ammo, x => (int)x > 0)
+                .SetPrecondition(GOAPKeyEnum.battery, x => (int)x > 0)
                 .SetEffect(GOAPKeyEnum.isAttacking, x => x = true)
                 .SetCost(1));
 
@@ -69,16 +68,16 @@ public class ZombunnyEnemy : EntityMovement
 
         _availableActions.Add(
             new GOAPAction(GOAPActionKeyEnum.Reload)
-                .SetPrecondition(GOAPKeyEnum.hasFireWeapon, x => (bool)x == true)
-                .SetPrecondition(GOAPKeyEnum.ammo, x => (int)x > 0)
+                //.SetPrecondition(GOAPKeyEnum.hasFireWeapon, x => (bool)x == true)
+                .SetPrecondition(GOAPKeyEnum.battery, x => (int)x > 0)
                 .SetEffect(GOAPKeyEnum.isWeaponLoaded, x => x = true)
                 .SetCost(1));
 
         _availableActions.Add(
-            new GOAPAction(GOAPActionKeyEnum.GrabAmmo)
-                .SetPrecondition(GOAPKeyEnum.ammoNearby, x => (bool)x == true)
-                .SetEffect(GOAPKeyEnum.ammo, x => x = (int)x + 1)
-                .SetCost(GetCostForAmmoNearby()));
+            new GOAPAction(GOAPActionKeyEnum.GrabBattery)
+                .SetPrecondition(GOAPKeyEnum.batteryNearby, x => (bool)x == true)
+                .SetEffect(GOAPKeyEnum.battery, x => x = (int)x + 1)
+                .SetCost(GetCostForBatteryNearby()));
 
         _availableActions.Add(
             new GOAPAction(GOAPActionKeyEnum.Melee)
@@ -113,14 +112,13 @@ public class ZombunnyEnemy : EntityMovement
         var actions = CreateActions();
         var initialState = new Map<GOAPKeyEnum, object>()
         {
-            { GOAPKeyEnum.ammo , ammo},
+            { GOAPKeyEnum.battery , battery},
             { GOAPKeyEnum.life , Life},
-            { GOAPKeyEnum.hasFireWeapon , weapon != WeaponType.None },
             { GOAPKeyEnum.isAttacking , false},
             { GOAPKeyEnum.isWeaponLoaded , isWeaponLoaded},
             { GOAPKeyEnum.isInMeleeRange , IsInMeleeRange() },
             { GOAPKeyEnum.isInWeaponRange , IsInShootingRange() },
-            { GOAPKeyEnum.ammoNearby , IsAmmoNearby() },
+            { GOAPKeyEnum.batteryNearby , IsBatteryNearby() },
             { GOAPKeyEnum.medikitNearby , IsMedikitNearby() }
         };
         var goal = new Map<GOAPKeyEnum, Func<object, bool>>() {
@@ -150,14 +148,14 @@ public class ZombunnyEnemy : EntityMovement
         float total = 0;
         GOAPState state = (GOAPState)curr;
 
-        if (state.goalValues.ContainsKey(GOAPKeyEnum.hasFireWeapon)) total += (bool)state.currentValues[GOAPKeyEnum.hasFireWeapon] ? 0 : 1;
+        //if (state.goalValues.ContainsKey(GOAPKeyEnum.hasFireWeapon)) total += (bool)state.currentValues[GOAPKeyEnum.hasFireWeapon] ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.isAttacking)) total += (bool)state.currentValues[GOAPKeyEnum.isAttacking] ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.isWeaponLoaded)) total += (bool)state.currentValues[GOAPKeyEnum.isWeaponLoaded] ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.isInMeleeRange)) total += (bool)state.currentValues[GOAPKeyEnum.isInMeleeRange] ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.isInWeaponRange)) total += (bool)state.currentValues[GOAPKeyEnum.isInWeaponRange] ? 0 : 1;
-        if (state.goalValues.ContainsKey(GOAPKeyEnum.ammoNearby)) total += (bool)state.currentValues[GOAPKeyEnum.ammoNearby] ? 0 : 1;
+        if (state.goalValues.ContainsKey(GOAPKeyEnum.batteryNearby)) total += (bool)state.currentValues[GOAPKeyEnum.batteryNearby] ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.medikitNearby)) total += (bool)state.currentValues[GOAPKeyEnum.medikitNearby] ? 0 : 1;
-        if (state.goalValues.ContainsKey(GOAPKeyEnum.ammo)) total += (int)state.currentValues[GOAPKeyEnum.ammo] > 0 ? 0 : 1;
+        if (state.goalValues.ContainsKey(GOAPKeyEnum.battery)) total += (int)state.currentValues[GOAPKeyEnum.battery] > 0 ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.life)) total += (float)state.currentValues[GOAPKeyEnum.life] > 5 ? 0 : 1;
 
         return total;
@@ -168,30 +166,30 @@ public class ZombunnyEnemy : EntityMovement
     #region Event Functions
     public void AnimShootPistol()
     {
-        if (ammo <= 0) return;
+        if (battery <= 0) return;
 
         Instantiate(shootParticle, barrel.transform.position, barrel.transform.rotation);
-        ammo--;
+        battery--;
         _clipSizeMax--;
     }
 
     public void AnimShootMachineGun()
     {
-        if (ammo <= 0) return;
+        if (battery <= 0) return;
 
         Instantiate(shootParticle, barrel.transform.position, barrel.transform.rotation);
-        ammo--;
+        battery--;
         _clipSizeMax--;
     }
 
     public void AnimShootShotgun()
     {
-        if (ammo <= 0) return;
+        if (battery <= 0) return;
 
         Instantiate(shootParticle, barrel.transform.position, barrel.transform.rotation);
         Instantiate(shootParticle, barrel.transform.position, barrel.transform.rotation * Quaternion.Euler(new Vector3(0, 25, 0)));
         Instantiate(shootParticle, barrel.transform.position, barrel.transform.rotation * Quaternion.Euler(new Vector3(0, -25, 0)));
-        ammo--;
+        battery--;
         _clipSizeMax--;
     }
 
@@ -243,6 +241,11 @@ public class ZombunnyEnemy : EntityMovement
     #region Normal Functions
     public override void Move()
     {
+        Node srcNode = Navigation.Instance.NearestTo(transform.position);
+        Node dstNode = Navigation.Instance.NearestTo(_player.transform.position);
+        var list = GraphOperations.AStar(srcNode, dstNode).ToList();
+
+
         _rg.MovePosition(transform.position + transform.forward * _movementSpeed * Time.fixedDeltaTime);
     }
 
@@ -288,22 +291,22 @@ public class ZombunnyEnemy : EntityMovement
         return _target != null ? Vector3.Distance(_target.position, transform.position) <= 1 : false;
     }
 
-    private bool IsAmmoNearby()
+    private bool IsBatteryNearby()
     {
-        return _closestAmmoBox != null;
+        return _closestBattery != null;
     }
 
-    private float GetCostForAmmoNearby()
+    private float GetCostForBatteryNearby()
     {
-        var ammoBoxes = Physics.OverlapSphere(transform.position, pickUpDistance, ammoLayerMask, QueryTriggerInteraction.Collide);
-        if (ammoBoxes.Length > 0)
+        var duracellBattery = Physics.OverlapSphere(transform.position, pickUpDistance, batteryLayerMask, QueryTriggerInteraction.Collide);
+        if (duracellBattery.Length > 0)
         {
-            _closestAmmoBox = ammoBoxes[0].transform;
-            return Vector3.Distance(_closestAmmoBox.position, transform.position);
+            _closestBattery = duracellBattery[0].transform;
+            return Vector3.Distance(_closestBattery.position, transform.position);
         }
         else
         {
-            _closestAmmoBox = null;
+            _closestBattery = null;
             return 99;
         }
     }
@@ -414,16 +417,16 @@ public class ZombunnyEnemy : EntityMovement
         GoGoGOAP();
     }
 
-    IEnumerator GrabAmmo()
+    IEnumerator GrabBattery()
     {
-        var ammoBoxes = Physics.OverlapSphere(transform.position, pickUpDistance, ammoLayerMask, QueryTriggerInteraction.Collide);
-        ammoBoxes.OrderBy(x => Vector3.Distance(x.transform.position, transform.position));
+        var batteries = Physics.OverlapSphere(transform.position, pickUpDistance, batteryLayerMask, QueryTriggerInteraction.Collide);
+        batteries.OrderBy(x => Vector3.Distance(x.transform.position, transform.position));
 
-        if (ammoBoxes.Length > 0)
+        if (batteries.Length > 0)
         {
-            _closestAmmoBox = ammoBoxes[0].transform;
+            _closestBattery = batteries[0].transform;
             var triggerSet = false;
-            SetTarget(_closestAmmoBox);
+            SetTarget(_closestBattery);
             SetMove(true);
             _finishAnimation = false;
 
@@ -440,7 +443,7 @@ public class ZombunnyEnemy : EntityMovement
                     _anim.ResetTrigger(StringTagManager.animPickUp);
                     break;
                 }
-                else if (_closestAmmoBox == null)
+                else if (_closestBattery == null)
                 {
                     GetGOAPPlaning();
                 }
@@ -484,13 +487,13 @@ public class ZombunnyEnemy : EntityMovement
     {
         SetTarget(_player);
         SetMove(false);
-        _anim.SetBool(weapon.ToString(), true);
-        while (ammo > 0 && _clipSizeMax > 0)
+        //_anim.SetBool(weapon.ToString(), true);
+        while (battery > 0 && _clipSizeMax > 0)
         {
             yield return null;
         }
         isWeaponLoaded = false;
-        _anim.SetBool(weapon.ToString(), false);
+        //_anim.SetBool(weapon.ToString(), false);
         GoGoGOAP();
     }
     #endregion
@@ -506,12 +509,4 @@ public class ZombunnyEnemy : EntityMovement
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, meleeDistance);
     }
-}
-
-public enum WeaponType
-{
-    ShootPistol,
-    ShootShotgun,
-    ShootMachineGun,
-    None
 }

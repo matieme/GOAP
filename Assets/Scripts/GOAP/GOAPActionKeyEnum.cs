@@ -6,6 +6,6 @@
     Rush,
     Forward,
     Reload,
-    GrabAmmo,
+    GrabBattery,
     GetHealed
 }

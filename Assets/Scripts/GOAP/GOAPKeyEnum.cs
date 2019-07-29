@@ -1,12 +1,12 @@
 ﻿public enum GOAPKeyEnum
 {
-    ammo,
+    battery,
     hasFireWeapon,
     isWeaponLoaded,
     isAttacking,
     isInWeaponRange,
     isInMeleeRange,
     life,
-    ammoNearby,
+    batteryNearby,
     medikitNearby
 }
