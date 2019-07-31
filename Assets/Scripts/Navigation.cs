@@ -7,7 +7,7 @@ public class Navigation : SingletonObject<Navigation>
 {
     private List<Node> _nodes = new List<Node>();
 
-    void Start()
+    void Awake()
     {
         foreach (Transform xf in transform)
         {
@@ -25,8 +25,8 @@ public class Navigation : SingletonObject<Navigation>
     public Node NearestTo(Vector3 pos)
     {
         return All()
-            .OrderBy(wp => {
-                var d = wp.transform.position - pos;
+            .OrderBy(n => {
+                var d = n.transform.position - pos;
                 d.y = 0;
                 return d.sqrMagnitude;
             })

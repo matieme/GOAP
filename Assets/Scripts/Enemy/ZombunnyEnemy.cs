@@ -30,6 +30,10 @@ public class ZombunnyEnemy : EntityMovement
     private bool _finishAnimation;
     private int _clipSizeMax;
 
+    Node _gizmoRealTarget;
+    Vector3 _vel;
+    public event Action<ZombunnyEnemy, Node, bool> OnReachDestination = delegate { };
+
     public override void Awake()
     {
         base.Awake();
@@ -38,13 +42,16 @@ public class ZombunnyEnemy : EntityMovement
         _clipSizeMax = clipSize;
         SetTarget(_player);
         GetGOAPPlaning();
+        _vel = Vector3.zero;
     }
 
     private void FixedUpdate()
     {
         if (_target == null || _isDeath) return;
-        if (_canMove) Move();
+        //if (_canMove) Move();
         Rotate();
+
+        transform.Translate(Time.fixedDeltaTime * _vel * movementSpeed);
     }
 
     #region GOAPPlaning Functions
@@ -148,7 +155,6 @@ public class ZombunnyEnemy : EntityMovement
         float total = 0;
         GOAPState state = (GOAPState)curr;
 
-        //if (state.goalValues.ContainsKey(GOAPKeyEnum.hasFireWeapon)) total += (bool)state.currentValues[GOAPKeyEnum.hasFireWeapon] ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.isAttacking)) total += (bool)state.currentValues[GOAPKeyEnum.isAttacking] ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.isWeaponLoaded)) total += (bool)state.currentValues[GOAPKeyEnum.isWeaponLoaded] ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.isInMeleeRange)) total += (bool)state.currentValues[GOAPKeyEnum.isInMeleeRange] ? 0 : 1;
@@ -241,12 +247,60 @@ public class ZombunnyEnemy : EntityMovement
     #region Normal Functions
     public override void Move()
     {
+        GoTo(_target.transform.position);
+    }
+
+    Coroutine _navCR;
+    public void GoTo(Vector3 destination)
+    {
+        _navCR = StartCoroutine(Navigate(destination));
+    }
+
+    protected virtual IEnumerator Navigate(Vector3 destination)
+    {
         Node srcNode = Navigation.Instance.NearestTo(transform.position);
-        Node dstNode = Navigation.Instance.NearestTo(_player.transform.position);
-        var list = GraphOperations.AStar(srcNode, dstNode).ToList();
+        Node dstNode = Navigation.Instance.NearestTo(destination);
 
+        _gizmoRealTarget = dstNode;
+        Node reachedDst = srcNode;
 
-        _rg.MovePosition(transform.position + transform.forward * _movementSpeed * Time.fixedDeltaTime);
+        if (srcNode != dstNode)
+        {
+            var path = GraphOperations.AStar(srcNode, dstNode).ToList();
+
+            if (path != null)
+            {
+                Debug.Log("COUNT" + path.Count());
+                foreach (var next in path.Select(w => FloorPos(w.Content)))
+                {
+                    Debug.Log("NEXT " + next.ToString());
+                    while ((next - FloorPos(this)).sqrMagnitude >= 0.05f)
+                    {
+                        _vel = (next - FloorPos(this)).normalized;
+                        yield return null;
+                    }
+                }
+            }
+            reachedDst = path.Last().Content;
+        }
+
+        if (reachedDst == dstNode)
+        {
+            _vel = (FloorPos(destination) - FloorPos(this)).normalized;
+            yield return new WaitUntil(() => (FloorPos(destination) - FloorPos(this)).sqrMagnitude < 0.05f);
+        }
+
+        _vel = Vector3.zero;
+        OnReachDestination(this, reachedDst, reachedDst == dstNode);
+    }
+
+    Vector3 FloorPos(MonoBehaviour b)
+    {
+        return FloorPos(b.transform.position);
+    }
+    Vector3 FloorPos(Vector3 v)
+    {
+        return new Vector3(v.x, 0f, v.z);
     }
 
     public void Rotate()
@@ -336,6 +390,7 @@ public class ZombunnyEnemy : EntityMovement
     IEnumerator Rush()
     {
         _anim.SetBool(StringTagManager.animRunning, true);
+        Move();
         _movementSpeed = rushingSpeed;
         SetTarget(_player);
         SetMove(true);
@@ -508,5 +563,8 @@ public class ZombunnyEnemy : EntityMovement
 
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, meleeDistance);
+
+        if (_gizmoRealTarget != null)
+            Gizmos.DrawCube(_gizmoRealTarget.transform.position + Vector3.up * 1f, Vector3.one * 0.3f);
     }
 }
