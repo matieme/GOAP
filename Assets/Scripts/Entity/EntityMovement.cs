@@ -12,9 +12,9 @@ public abstract class EntityMovement : EntityLife
     protected bool _canMove;
     public abstract void Move();
 
-    public override void Awake()
+    public override void Start()
     {
-        base.Awake();
+        base.Start();
         _rg = GetComponent<Rigidbody>();
         _movementSpeed = movementSpeed;
         _canMove = true;

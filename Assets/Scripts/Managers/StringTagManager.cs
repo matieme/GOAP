@@ -9,6 +9,8 @@ public class StringTagManager : MonoBehaviour
     public const string tagPathfinding = "Pathfinding";
     public const string tagNode = "Node";
 
+    public const string maskShootable = "Shootable";
+
     public const string animPunch = "Punch";
     public const string animDead = "Dead";
     public const string animPickUp = "PickUp";

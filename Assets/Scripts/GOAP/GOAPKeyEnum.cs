@@ -2,7 +2,7 @@
 {
     battery,
     hasFireWeapon,
-    isWeaponLoaded,
+    isLaserLoaded,
     isAttacking,
     isInWeaponRange,
     isInMeleeRange,

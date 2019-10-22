@@ -10,6 +10,20 @@ public class Node : MonoBehaviour, IGraphNode<Node>
     public List<Node> adyacent;
     public Node Content { get { return this; } }
 
+    public void Awake()
+    {
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 1, transform.forward, LayerMask.NameToLayer(StringTagManager.tagNode));
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Node node = hits[i].collider.gameObject.GetComponent<Node>();
+            if (node != null)
+            {
+                adyacent.Add(node);
+            }                
+        }
+    }
+
     public IEnumerator<FP.Tuple<float, IGraphNode<Node>>> GetEnumerator()
     {
         foreach (var neighbor in adyacent)
@@ -38,6 +52,8 @@ public class Node : MonoBehaviour, IGraphNode<Node>
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, 0.3f);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, 1);
         Gizmos.color = Color.green;
         foreach (var wp in adyacent)
         {

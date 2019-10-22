@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 391163675217350532}
   - component: {fileID: 5378986561588558406}
   - component: {fileID: 651959745419177116}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: DuracellBattery
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -135,4 +135,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d0de2986e1a5c44b7a0568ac76213e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  batteryChargeAmount: 10
+  batteryChargeAmount: 1

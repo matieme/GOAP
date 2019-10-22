@@ -18,7 +18,7 @@ public class EntityLife : MonoBehaviour
     protected float _lifeMax;
     protected bool _isDeath;
 
-    public virtual void Awake()
+    public virtual void Start()
     {
         _lifeMax = _life;
     }
