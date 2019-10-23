@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ public class GridNodeCreator : EditorWindow
     private int yNodes;
 
     private Vector3 startPosition = new Vector3(0,0,0);
+
+    private List<GameObject> nodes;
 
     [MenuItem("Pathfinding Editor/Create Nodes")]
     static void Init()
@@ -52,15 +55,35 @@ public class GridNodeCreator : EditorWindow
 
     private void CreateGrid()
     {
+        nodes = new List<GameObject>();
         GameObject parent = GameObject.Find("Navigation");
+        parent.transform.rotation = Quaternion.Euler(0, 0, 0);
         for (int i = 0; i < xNodes; i++)
         {
             for (int j = 0; j < yNodes; j++)
             {
-                //Debug.Log(startPosition + new Vector3(i, 0f, j));
                 Vector3 pos = startPosition + new Vector3(i, 0f, j);
-                Instantiate(_node, pos, Quaternion.identity, parent.transform);
-                //grid[i, j] = Instantiate(tile, start + new Vector3(i, j, 0f), Quaternion.identity);
+                GameObject goNode = Instantiate(_node, pos, Quaternion.identity, parent.transform);
+                nodes.Add(goNode);
+            }
+        }
+
+        parent.transform.rotation = Quaternion.Euler(0, 45, 0);
+
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            Collider[] shooteables = Physics.OverlapSphere(nodes[i].transform.position, 1);
+
+            if (shooteables.Length > 0)
+            {
+                for (int r = 0; r < shooteables.Length; r++)
+                {
+                    if (shooteables[r].gameObject.layer == LayerMask.NameToLayer(StringTagManager.maskShootable))
+                    {
+                        DestroyImmediate(nodes[i].gameObject);
+                        break;
+                    }
+                }
             }
         }
     }

@@ -12,15 +12,21 @@ public class Node : MonoBehaviour, IGraphNode<Node>
 
     public void Awake()
     {
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 1, transform.up, LayerMask.NameToLayer(StringTagManager.tagNode));
+        Collider[] hits = Physics.OverlapSphere(transform.position, 1.2f);
 
-        for (int i = 0; i < hits.Length; i++)
+        if (hits.Length > 0)
         {
-            Node node = hits[i].collider.gameObject.GetComponent<Node>();
-            if (node != null)
+            for (int i = 0; i < hits.Length; i++)
             {
-                adyacent.Add(node);
-            }                
+                if (hits[i].gameObject.layer == LayerMask.NameToLayer(StringTagManager.tagNode))
+                {
+                    Node node = hits[i].gameObject.GetComponent<Node>();
+                    if (node != null)
+                    {
+                        adyacent.Add(node);
+                    }
+                }
+            }
         }
     }
 
