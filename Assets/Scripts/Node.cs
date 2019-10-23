@@ -12,7 +12,7 @@ public class Node : MonoBehaviour, IGraphNode<Node>
 
     public void Awake()
     {
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 1, transform.forward, LayerMask.NameToLayer(StringTagManager.tagNode));
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 1, transform.up, LayerMask.NameToLayer(StringTagManager.tagNode));
 
         for (int i = 0; i < hits.Length; i++)
         {
@@ -50,6 +50,7 @@ public class Node : MonoBehaviour, IGraphNode<Node>
 
     void OnDrawGizmos()
     {
+        /*
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, 0.3f);
         Gizmos.color = Color.blue;
@@ -59,5 +60,6 @@ public class Node : MonoBehaviour, IGraphNode<Node>
         {
             Gizmos.DrawLine(transform.position, wp.transform.position);
         }
+        */
     }
 }

@@ -52,7 +52,7 @@ public class GridNodeCreator : EditorWindow
 
     private void CreateGrid()
     {
-        GameObject parent = GameObject.Find("ContenedorDeNodos");
+        GameObject parent = GameObject.Find("Navigation");
         for (int i = 0; i < xNodes; i++)
         {
             for (int j = 0; j < yNodes; j++)

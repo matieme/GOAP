@@ -246,7 +246,9 @@ public class ZombunnyEnemy : EntityMovement
     private void OnReachDestinationStopMoving(ZombunnyEnemy arg1, Node arg2, bool arg3)
     {
         rotateInPath = false;
-        StopMoving();
+        Debug.LogError("Hookear otro estado");
+        //StopMoving();
+        GoGoGOAP();
     }
 
     public void StopMoving()
@@ -270,10 +272,8 @@ public class ZombunnyEnemy : EntityMovement
 
             if (path != null)
             {
-                Debug.Log("COUNT" + path.Count());
                 foreach (var next in path.Select(w => FloorPos(w.Content)))
                 {
-                    Debug.Log("NEXT " + next.ToString());
                     RotateInPath(next);
                     while ((next - FloorPos(this)).sqrMagnitude >= 0.05f)
                     {
@@ -326,7 +326,7 @@ public class ZombunnyEnemy : EntityMovement
     private void SetMove(bool value)
     {
         _canMove = value;
-        _anim.SetBool(StringTagManager.animWalking, value);
+        //_anim.SetBool(StringTagManager.animWalking, value);
     }
 
     private void SetTarget(Transform value)
@@ -431,7 +431,7 @@ public class ZombunnyEnemy : EntityMovement
     {
         SetMove(false);
         _finishAnimation = false;
-        _anim.SetTrigger(StringTagManager.animPunch);
+        _anim.SetTrigger(StringTagManager.animAttack);
         while (!_finishAnimation)
         {
             yield return null;
@@ -528,10 +528,9 @@ public class ZombunnyEnemy : EntityMovement
     IEnumerator Reload()
     {
         SetMove(false);
-        //_finishAnimation = false;
+        Rotate();
+        _finishAnimation = false;
         _anim.SetTrigger(StringTagManager.animReload);
-        AnimReload();
-        _finishAnimation = true;
 
         while (!_finishAnimation)
         {
@@ -544,6 +543,7 @@ public class ZombunnyEnemy : EntityMovement
     {
         SetTarget(_player);
         SetMove(true);
+        Move();
         while (true)
         {
             if (IsInShootingRange()) break;
@@ -555,6 +555,7 @@ public class ZombunnyEnemy : EntityMovement
     IEnumerator Shoot()
     {
         SetTarget(_player);
+        Rotate();
         SetMove(false);
         //_anim.SetBool(weapon.ToString(), true);
         while (battery > 0 && _clipSizeMax > 0)

@@ -11,7 +11,7 @@ public class StringTagManager : MonoBehaviour
 
     public const string maskShootable = "Shootable";
 
-    public const string animPunch = "Punch";
+    public const string animAttack = "Attack";
     public const string animDead = "Dead";
     public const string animPickUp = "PickUp";
     public const string animReload = "Reload";
