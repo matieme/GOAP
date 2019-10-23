@@ -247,7 +247,6 @@ public class ZombunnyEnemy : EntityMovement
     private void OnReachDestinationStopMoving(ZombunnyEnemy arg1, Node arg2, bool arg3)
     {
         rotateInPath = false;
-        Debug.LogError("Hookear otro estado");
         //StopMoving();
         GoGoGOAP();
     }
@@ -354,7 +353,18 @@ public class ZombunnyEnemy : EntityMovement
 
     private bool IsInShootingRange()
     {
-        return _target != null ? Vector3.Distance(_target.position, transform.position) <= enemyShooting.shootDistance : false;
+        bool targetInSight = true;
+        Vector3 dirToTarget = _target.transform.position - transform.position;
+        RaycastHit[] rch;
+        rch = Physics.RaycastAll(transform.position, dirToTarget, enemyShooting.shootDistance);
+        for (int i = 0; i < rch.Length; i++)
+        {
+            RaycastHit hit = rch[i];
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer(StringTagManager.maskShootable))
+                targetInSight = false;
+        }
+
+        return _target != null ? Vector3.Distance(_target.position, transform.position) <= enemyShooting.shootDistance && targetInSight: false;
     }
 
     private bool IsInPickUpRange()
@@ -561,17 +571,21 @@ public class ZombunnyEnemy : EntityMovement
 
     IEnumerator Shoot()
     {
-        SetTarget(_player);
-        Rotate();
-        SetMove(false);
-        //_anim.SetBool(weapon.ToString(), true);
-        while (battery > 0 && _clipSizeMax > 0)
+        if(IsInShootingRange())
         {
-            yield return null;
+            SetTarget(_player);
+            Rotate();
+            SetMove(false);
+            //_anim.SetBool(weapon.ToString(), true);
+            while (battery > 0 && _clipSizeMax > 0)
+            {
+                yield return null;
+            }
+            isLaserLoaded = false;
+            AnimShootLaser();
+            //_anim.SetBool(weapon.ToString(), false);
+
         }
-        isLaserLoaded = false;
-        AnimShootLaser();
-        //_anim.SetBool(weapon.ToString(), false);
         GoGoGOAP();
     }
     #endregion
