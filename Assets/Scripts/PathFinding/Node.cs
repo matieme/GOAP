@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using GOAP;
-using FP;
+using GameUtils;
 using System;
 
 public class Node : MonoBehaviour, IGraphNode<Node>
@@ -30,10 +30,10 @@ public class Node : MonoBehaviour, IGraphNode<Node>
         }
     }
 
-    public IEnumerator<FP.Tuple<float, IGraphNode<Node>>> GetEnumerator()
+    public IEnumerator<GameUtils.Tuple<float, IGraphNode<Node>>> GetEnumerator()
     {
         foreach (var neighbor in adyacent)
-            yield return FP.Tuple.New(
+            yield return GameUtils.Tuple.New(
                 Heuristic(neighbor),
                 (IGraphNode<Node>)neighbor.Content
             );

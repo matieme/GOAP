@@ -1,4 +1,4 @@
-namespace FP
+namespace GameUtils
 {
     public class Tuple<T1, T2>
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using GOAP;
-using FP;
+using GameUtils;
 using System;
 using System.Linq;
 
@@ -59,7 +59,8 @@ public class ZombunnyEnemy : EntityMovement
         if(!rotateInPath)
             Rotate();
 
-        transform.position += _vel * Time.deltaTime * movementSpeed;
+        if(_canMove)
+            transform.position += _vel * Time.deltaTime * movementSpeed;
     }
 
     #region GOAPPlaning Functions
@@ -584,7 +585,6 @@ public class ZombunnyEnemy : EntityMovement
             isLaserLoaded = false;
             AnimShootLaser();
             //_anim.SetBool(weapon.ToString(), false);
-
         }
         GoGoGOAP();
     }

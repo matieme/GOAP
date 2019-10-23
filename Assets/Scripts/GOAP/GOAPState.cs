@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FP;
+using GameUtils;
 using UnityEngine;
 
 namespace GOAP
@@ -28,7 +28,7 @@ namespace GOAP
 
         public GOAPState Content { get { return this; } }
 
-        public IEnumerator<FP.Tuple<float, IGraphNode<GOAPState>>> GetEnumerator()
+        public IEnumerator<GameUtils.Tuple<float, IGraphNode<GOAPState>>> GetEnumerator()
         {
             //This optimization shortens search time greatly by pruning actions that do not contribute to
             //reaching the goal
@@ -43,7 +43,7 @@ namespace GOAP
             ));
 
             foreach (var action in satisfyingActions)
-                yield return FP.Tuple.New(
+                yield return GameUtils.Tuple.New(
                     //Use a cost of at least the precondition count, since our heuristic is "unsatisfied goal count"
                     //this guarantees that we are not overestimating
                     Math.Max(action.Cost, action.Preconditions.Count()),

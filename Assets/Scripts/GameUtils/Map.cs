@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace FP
+namespace GameUtils
 {
     public class Map<K, V> : Dictionary<K, V>
     {

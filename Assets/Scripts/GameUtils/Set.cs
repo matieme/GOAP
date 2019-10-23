@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace FP
+namespace GameUtils
 {
     public class Set<T> : HashSet<T>
     {
