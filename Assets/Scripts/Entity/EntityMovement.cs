@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public abstract class EntityMovement : EntityLife
+public abstract class EntityMovement : EnemyHealth
 {
     public bool isMoving { get { return _isMoving; } }
     public bool canMove { get { return _canMove; } }

@@ -2,10 +2,9 @@
 using System.Collections;
 using UnityEngine;
 
-public class EnemyHealth : MonoBehaviour
+public class EnemyHealth : EntityLife
 {
     public int startingHealth = 100;
-    public int currentHealth;
     public float sinkSpeed = 0.5f;
     public int scoreValue = 10;
     public AudioClip deathClip;
@@ -14,11 +13,9 @@ public class EnemyHealth : MonoBehaviour
     AudioSource enemyAudio;
     ParticleSystem hitParticles;
     CapsuleCollider capsuleCollider;
-    bool isDead;
     bool isSinking;
 
     public Action OnDeath;
-
 
     void Awake()
     {
@@ -26,8 +23,6 @@ public class EnemyHealth : MonoBehaviour
         enemyAudio = GetComponent<AudioSource>();
         hitParticles = GetComponentInChildren<ParticleSystem>();
         capsuleCollider = GetComponent<CapsuleCollider>();
-
-        currentHealth = startingHealth;
     }
 
     void Update()
@@ -38,21 +33,19 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-
     public void TakeDamage(int amount, Vector3 hitPoint)
     {
-        if (isDead)
+        if (_isDeath)
             return;
 
         enemyAudio.Play();
-
-        currentHealth -= amount;
+        Damaged(amount);
 
         hitParticles.transform.position = hitPoint;
 
         hitParticles.Play();
 
-        if (currentHealth <= 0)
+        if (Life <= 0)
         {
             Death();
         }
@@ -61,7 +54,7 @@ public class EnemyHealth : MonoBehaviour
 
     void Death()
     {
-        isDead = true;
+        Destroyed();
         capsuleCollider.isTrigger = true;
         anim.SetTrigger(StringTagManager.animDead);
 

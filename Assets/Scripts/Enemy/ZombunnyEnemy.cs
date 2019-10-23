@@ -49,6 +49,7 @@ public class ZombunnyEnemy : EntityMovement
         GetGOAPPlaning();
         _vel = Vector3.zero;
         OnReachDestination += OnReachDestinationStopMoving;
+        OnDeath += OnZombunnyDeath;
     }
 
     private void FixedUpdate()
@@ -255,6 +256,12 @@ public class ZombunnyEnemy : EntityMovement
     {
         if (_navCR != null) StopCoroutine(_navCR);
         _vel = Vector3.zero;
+    }
+
+
+    private void OnZombunnyDeath()
+    {
+        _isDeath = true;
     }
 
     protected virtual IEnumerator Navigate(Vector3 destination)
