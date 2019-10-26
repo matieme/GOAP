@@ -9,7 +9,6 @@ using System.Linq;
 public class ZombunnyEnemy : EntityMovement
 {
     public GameObject shootParticle;
-    public GameObject barrel;
     public bool isLaserLoaded;
     public float rushingSpeed;
     public float rotationSpeed;
@@ -32,12 +31,6 @@ public class ZombunnyEnemy : EntityMovement
     private Animator _anim;
     private bool _finishAnimation;
     private int _clipSizeMax;
-
-    Coroutine _navCR;
-    Node _gizmoRealTarget;
-    Vector3 _vel;
-    bool rotateInPath;
-    public event Action<ZombunnyEnemy, Node, bool> OnReachDestination = delegate { };
 
     public override void Start()
     {
@@ -153,6 +146,8 @@ public class ZombunnyEnemy : EntityMovement
 
     private void GoGoGOAP()
     {
+        if (_isDeath) return;
+
         foreach (string item in _queueActions)
         {
             Debug.LogError(item);
@@ -245,7 +240,7 @@ public class ZombunnyEnemy : EntityMovement
         _navCR = StartCoroutine(Navigate(destination));
     }
 
-    private void OnReachDestinationStopMoving(ZombunnyEnemy arg1, Node arg2, bool arg3)
+    private void OnReachDestinationStopMoving(Node arg2, bool arg3)
     {
         rotateInPath = false;
         //StopMoving();
@@ -264,54 +259,6 @@ public class ZombunnyEnemy : EntityMovement
         _isDeath = true;
     }
 
-    protected virtual IEnumerator Navigate(Vector3 destination)
-    {
-        Node srcNode = Navigation.Instance.NearestTo(transform.position);
-        Node dstNode = Navigation.Instance.NearestTo(destination);
-
-        _gizmoRealTarget = dstNode;
-        Node reachedDst = srcNode;
-
-        if (srcNode != dstNode)
-        {
-            rotateInPath = true;
-            var path = GraphOperations.AStar(srcNode, dstNode).ToList();
-
-            if (path != null)
-            {
-                foreach (var next in path.Select(w => FloorPos(w.Content)))
-                {
-                    RotateInPath(next);
-                    while ((next - FloorPos(this)).sqrMagnitude >= 0.05f)
-                    {
-                        _vel = (next - FloorPos(this)).normalized;
-                        yield return null;
-                    }
-                }
-            }
-            reachedDst = path.Last().Content;
-        }
-
-        if (reachedDst == dstNode)
-        {
-            rotateInPath = false;
-            _vel = (FloorPos(destination) - FloorPos(this)).normalized;
-            yield return new WaitUntil(() => (FloorPos(destination) - FloorPos(this)).sqrMagnitude < 0.05f);
-        }
-
-        _vel = Vector3.zero;
-        OnReachDestination(this, reachedDst, reachedDst == dstNode);
-    }
-
-    Vector3 FloorPos(MonoBehaviour b)
-    {
-        return FloorPos(b.transform.position);
-    }
-    Vector3 FloorPos(Vector3 v)
-    {
-        return new Vector3(v.x, 0f, v.z);
-    }
-
     public void Rotate()
     {
         transform.LookAt(_target);
@@ -323,11 +270,6 @@ public class ZombunnyEnemy : EntityMovement
         quack.z = 0;
         _rg.MoveRotation(Quaternion.RotateTowards(transform.rotation, quack, rotationSpeed * Time.fixedDeltaTime));    
         */
-    }
-
-    public void RotateInPath(Vector3 target)
-    {
-        transform.LookAt(target);
     }
 
     private void SetMove(bool value)
@@ -417,7 +359,6 @@ public class ZombunnyEnemy : EntityMovement
     #region GOAP Interfaces
     IEnumerator Rush()
     {
-        _anim.SetBool(StringTagManager.animRunning, true);
         Move();
         _movementSpeed = rushingSpeed;
         SetTarget(_player);
@@ -428,7 +369,6 @@ public class ZombunnyEnemy : EntityMovement
             yield return null;
         }
         _movementSpeed = movementSpeed;
-        _anim.SetBool(StringTagManager.animRunning, false);
         GoGoGOAP();
     }
 
@@ -448,6 +388,7 @@ public class ZombunnyEnemy : EntityMovement
     IEnumerator Melee()
     {
         SetMove(false);
+        Rotate();
         _finishAnimation = false;
         _anim.SetTrigger(StringTagManager.animAttack);
         while (!_finishAnimation)
