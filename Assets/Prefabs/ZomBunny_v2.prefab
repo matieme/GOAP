@@ -4957,13 +4957,12 @@ MonoBehaviour:
   deathClip: {fileID: 0}
   movementSpeed: 2
   shootParticle: {fileID: 0}
-  barrel: {fileID: 0}
   isLaserLoaded: 0
-  rushingSpeed: 0
+  rushingSpeed: 3.5
   rotationSpeed: 2
   meleeDamage: 0
-  meleeDistance: 3.5
-  pickUpDistance: 6
+  meleeDistance: 1.5
+  pickUpDistance: 7
   clipSize: 0
   batteryLayerMask:
     serializedVersion: 2
@@ -9999,7 +9998,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damagePerShot: 20
   timeBetweenBullets: 0.15
-  shootDistance: 7
+  shootDistance: 8
   faceLight: {fileID: 3257696790672534764}
 --- !u!199 &3387269470492068411
 ParticleSystemRenderer:

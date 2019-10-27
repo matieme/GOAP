@@ -53,7 +53,7 @@ public class ZombunnyEnemy : EntityMovement
             Rotate();
 
         if(_canMove)
-            transform.position += _vel * Time.deltaTime * movementSpeed;
+            transform.position += _vel * Time.deltaTime * _movementSpeed;
     }
 
     #region GOAPPlaning Functions
@@ -71,6 +71,7 @@ public class ZombunnyEnemy : EntityMovement
 
         _availableActions.Add(
             new GOAPAction(GOAPActionKeyEnum.PositionToShoot)
+                .SetPrecondition(GOAPKeyEnum.battery, x => (int)x > 0)
                 .SetEffect(GOAPKeyEnum.isInWeaponRange, x => x = true)
                 .SetCost(Math.Max(Vector3.Distance(_player.position, transform.position) - enemyShooting.shootDistance, 1)));
 
@@ -90,7 +91,7 @@ public class ZombunnyEnemy : EntityMovement
             new GOAPAction(GOAPActionKeyEnum.Melee)
                 .SetPrecondition(GOAPKeyEnum.isInMeleeRange, x => (bool)x == true)
                 .SetEffect(GOAPKeyEnum.isAttacking, x => x = true)
-                .SetCost(10));
+                .SetCost(50));
 
         _availableActions.Add(
             new GOAPAction(GOAPActionKeyEnum.Rush)
@@ -275,7 +276,6 @@ public class ZombunnyEnemy : EntityMovement
     private void SetMove(bool value)
     {
         _canMove = value;
-        //_anim.SetBool(StringTagManager.animWalking, value);
     }
 
     private void SetTarget(Transform value)
@@ -361,6 +361,7 @@ public class ZombunnyEnemy : EntityMovement
     {
         Move();
         _movementSpeed = rushingSpeed;
+        _anim.speed = 1.7f;
         SetTarget(_player);
         SetMove(true);
         while (true)
@@ -369,6 +370,7 @@ public class ZombunnyEnemy : EntityMovement
             yield return null;
         }
         _movementSpeed = movementSpeed;
+        _anim.speed = 1;
         GoGoGOAP();
     }
 
@@ -508,7 +510,7 @@ public class ZombunnyEnemy : EntityMovement
             if (IsInShootingRange()) break;
             yield return null;
         }
-        GoGoGOAP();
+        GetGOAPPlaning();
     }
 
     IEnumerator Shoot()
@@ -527,7 +529,7 @@ public class ZombunnyEnemy : EntityMovement
             AnimShootLaser();
             //_anim.SetBool(weapon.ToString(), false);
         }
-        GoGoGOAP();
+        GetGOAPPlaning();
     }
     #endregion
 
