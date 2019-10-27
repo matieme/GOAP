@@ -17,6 +17,7 @@ public class StringTagManager : MonoBehaviour
     public const string animReload = "Reload";
     public const string animWalking = "Walking";
     public const string animRunning = "Running";
+    public const string animShoot = "Shoot";
 
     public const string animIdleRotate = "IdleRotate";
     public const string animShooting = "Shooting";

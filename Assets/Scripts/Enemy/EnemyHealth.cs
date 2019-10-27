@@ -11,7 +11,7 @@ public class EnemyHealth : EntityLife
 
     Animator anim;
     AudioSource enemyAudio;
-    ParticleSystem hitParticles;
+    public ParticleSystem hitParticles;
     CapsuleCollider capsuleCollider;
     bool isSinking;
 
@@ -21,7 +21,6 @@ public class EnemyHealth : EntityLife
     {
         anim = GetComponent<Animator>();
         enemyAudio = GetComponent<AudioSource>();
-        hitParticles = GetComponentInChildren<ParticleSystem>();
         capsuleCollider = GetComponent<CapsuleCollider>();
     }
 

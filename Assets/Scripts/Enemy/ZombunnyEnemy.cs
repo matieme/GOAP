@@ -21,6 +21,9 @@ public class ZombunnyEnemy : EntityMovement
     public LayerMask mediKitLayerMask;
 
     [SerializeField]
+    private ParticleSystem biteEffect;
+
+    [SerializeField]
     private EnemyShooting enemyShooting;
 
     private Queue<string> _queueActions = new Queue<string>();
@@ -393,6 +396,7 @@ public class ZombunnyEnemy : EntityMovement
         Rotate();
         _finishAnimation = false;
         _anim.SetTrigger(StringTagManager.animAttack);
+        biteEffect.Play();
         while (!_finishAnimation)
         {
             yield return null;

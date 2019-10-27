@@ -7,6 +7,7 @@ public class EnemyShooting : MonoBehaviour
     public int damagePerShot = 20;
     public float timeBetweenBullets = 0.15f;
     public float shootDistance;
+    public Transform shootTransform;
 
     float timer;
     Ray shootRay = new Ray();
@@ -60,14 +61,19 @@ public class EnemyShooting : MonoBehaviour
         gunParticles.Play();
 
         gunLine.enabled = true;
-        gunLine.SetPosition(0, transform.position);
+        gunLine.SetPosition(0, shootTransform.position);
 
         shootRay.origin = transform.position;
         shootRay.direction = transform.forward;
 
-        if (Physics.Raycast(shootRay, out shootHit, shootDistance, shootableMask))
+        if (Physics.Raycast(shootRay, out shootHit, shootDistance, playerMask))
         {
             gunLine.SetPosition(1, shootHit.point);
+            PlayerHealth player = shootHit.collider.GetComponent<PlayerHealth>();
+            if(player != null)
+            {
+                player.TakeDamage(damagePerShot);
+            }
         }
         else
         {
