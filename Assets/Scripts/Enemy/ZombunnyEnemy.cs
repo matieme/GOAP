@@ -12,7 +12,7 @@ public class ZombunnyEnemy : EntityMovement
     public bool isLaserLoaded;
     public float rushingSpeed;
     public float rotationSpeed;
-    public float meleeDamage;
+    public int meleeDamage;
     public float meleeDistance;
 
     public float pickUpDistance;
@@ -212,13 +212,15 @@ public class ZombunnyEnemy : EntityMovement
         _clipSizeMax = clipSize;
     }
 
-    public void AnimPunch()
+    public void AnimMeleeAttack()
     {
-        var victim = _target.GetComponent<EntityLife>();
+        biteEffect.Play();
+
+        var victim = _target.GetComponent<PlayerHealth>();
 
         if (victim != null && Vector3.Distance(_target.position, transform.position) <= meleeDistance * 2)
         {
-            victim.Damaged(meleeDamage);
+            victim.TakeDamage(meleeDamage);
         }
     }
 
@@ -396,7 +398,6 @@ public class ZombunnyEnemy : EntityMovement
         Rotate();
         _finishAnimation = false;
         _anim.SetTrigger(StringTagManager.animAttack);
-        biteEffect.Play();
         while (!_finishAnimation)
         {
             yield return null;

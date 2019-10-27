@@ -4992,7 +4992,7 @@ MonoBehaviour:
   isLaserLoaded: 0
   rushingSpeed: 3.5
   rotationSpeed: 2
-  meleeDamage: 0
+  meleeDamage: 5
   meleeDistance: 1.2
   pickUpDistance: 7
   clipSize: 0

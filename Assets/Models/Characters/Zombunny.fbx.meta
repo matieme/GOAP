@@ -468,8 +468,8 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.63819706
-        functionName: AnimPunch
+      - time: 0.87001526
+        functionName: AnimMeleeAttack
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
