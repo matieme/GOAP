@@ -16,4 +16,12 @@ public class BatteryManager : SingletonObject<BatteryManager>
                 batteries.Add(wp);
         }
     }
+
+    public void RemoveBattery(DuracellBattery b)
+    {
+        if(batteries.Contains(b))
+        {
+            batteries.Remove(b);
+        }
+    }
 }

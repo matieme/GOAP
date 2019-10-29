@@ -7,6 +7,7 @@ public class DuracellBattery : MonoBehaviour
 
     public int GetBattery()
     {
+        BatteryManager.Instance.RemoveBattery(this);
         StartCoroutine(DestroyOnUse());
         return batteryChargeAmount;
     }
