@@ -15019,6 +15019,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ZombunnyBiteEffect
       objectReference: {fileID: 0}
+    - target: {fileID: 7434557478965112492, guid: aeb445d1e68babc47b722b14f811d668,
+        type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7434557478946761698, guid: aeb445d1e68babc47b722b14f811d668,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -15074,7 +15079,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7434557478965112492, guid: aeb445d1e68babc47b722b14f811d668,
+    - target: {fileID: 7434557478965112494, guid: aeb445d1e68babc47b722b14f811d668,
         type: 3}
       propertyPath: playOnAwake
       value: 0
@@ -15085,11 +15090,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7434557478965112490, guid: aeb445d1e68babc47b722b14f811d668,
-        type: 3}
-      propertyPath: playOnAwake
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434557478965112494, guid: aeb445d1e68babc47b722b14f811d668,
         type: 3}
       propertyPath: playOnAwake
       value: 0

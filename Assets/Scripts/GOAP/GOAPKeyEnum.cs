@@ -8,5 +8,6 @@
     isInMeleeRange,
     life,
     batteryNearby,
-    medikitNearby
+    medikitNearby,
+    playerIsAlive
 }

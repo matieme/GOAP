@@ -27,6 +27,9 @@ public class ZombunnyEnemy : EntityMovement
     private EnemyShooting enemyShooting;
 
     private Queue<string> _queueActions = new Queue<string>();
+    private Dictionary<string, Func<bool>> concreteActions = new Dictionary<string, Func<bool>>();
+    private bool hasRun;
+
     private Transform _target;
     private Transform _player;
     private Transform _closestBattery;
@@ -42,6 +45,7 @@ public class ZombunnyEnemy : EntityMovement
         _player = GameObject.FindGameObjectWithTag(StringTagManager.tagPlayer).transform;
         _clipSizeMax = clipSize;
         SetTarget(_player);
+        CreateConcreteActionsDict();
         GetGOAPPlaning();
         _vel = Vector3.zero;
         OnReachDestination += OnReachDestinationStopMoving;
@@ -130,20 +134,19 @@ public class ZombunnyEnemy : EntityMovement
             { GOAPKeyEnum.isInMeleeRange , IsInMeleeRange() },
             { GOAPKeyEnum.isInWeaponRange , IsInShootingRange() },
             { GOAPKeyEnum.batteryNearby , IsBatteryNearby() },
-            { GOAPKeyEnum.medikitNearby , IsMedikitNearby() }
+            { GOAPKeyEnum.medikitNearby , IsMedikitNearby() },
+            { GOAPKeyEnum.playerIsAlive , IsPlayerAlive() }
         };
         var goal = new Map<GOAPKeyEnum, Func<object, bool>>() {
-            { GOAPKeyEnum.isAttacking , x => (bool) x == true}
+            { GOAPKeyEnum.isAttacking , x => (bool) x == true},
+            { GOAPKeyEnum.playerIsAlive , x => (bool) x == true}
         };
 
         var plan = new GOAPPlan(actions, initialState, goal, heuristic);
 
-        //var count = 0;
         foreach (var action in plan.Execute())
         {
-            //count++;
             _queueActions.Enqueue(action.Name.ToString());
-            //Debug.Log(count + ": " + action.Name.ToString());
         }
         GoGoGOAP();
     }
@@ -159,7 +162,7 @@ public class ZombunnyEnemy : EntityMovement
 
         Debug.LogError("-----------------------------");
 
-        if (_queueActions.Count > 0) StartCoroutine(_queueActions.Dequeue());
+        if (_queueActions.Count > 0) StartCoroutine(ExecuteAction(concreteActions[_queueActions.Dequeue()]));
         else GetGOAPPlaning();
     }
 
@@ -178,6 +181,13 @@ public class ZombunnyEnemy : EntityMovement
         if (state.goalValues.ContainsKey(GOAPKeyEnum.life)) total += (float)state.currentValues[GOAPKeyEnum.life] > 5 ? 0 : 1;
 
         return total;
+    }
+
+    private Dictionary<String, Func<bool>> CreateConcreteActionsDict()
+    {
+        concreteActions.Add(GOAPActionKeyEnum.Rush.ToString(), Rush);
+        concreteActions.Add(GOAPActionKeyEnum.Melee.ToString(), Melee);
+        return concreteActions;
     }
 
     #endregion
@@ -249,8 +259,8 @@ public class ZombunnyEnemy : EntityMovement
     private void OnReachDestinationStopMoving(Node arg2, bool arg3)
     {
         rotateInPath = false;
-        //StopMoving();
-        GoGoGOAP();
+        hasRun = false;
+        GetGOAPPlaning();
     }
 
     public void StopMoving()
@@ -292,6 +302,11 @@ public class ZombunnyEnemy : EntityMovement
     {
         base.Destroyed();
         _anim.SetTrigger(StringTagManager.animDead);
+    }
+
+    private bool IsPlayerAlive()
+    {
+        return PlayerHealth.Instance.currentHealth > 0; 
     }
 
     private bool IsInMeleeRange()
@@ -362,21 +377,34 @@ public class ZombunnyEnemy : EntityMovement
     #endregion
 
     #region GOAP Interfaces
-    IEnumerator Rush()
+    IEnumerator ExecuteAction(Func<bool> action)
     {
-        Move();
-        _movementSpeed = rushingSpeed;
-        _anim.speed = 1.7f;
-        SetTarget(_player);
-        SetMove(true);
-        while (true)
+        while (!action()) yield return null;
+        GetGOAPPlaning();
+    }
+
+    private bool Rush()
+    {
+        Action initial = () => {
+            Move();
+            _movementSpeed = rushingSpeed;
+            _anim.speed = 1.7f;
+            SetTarget(_player);
+            SetMove(true);
+        };
+
+        RunOnceAction(initial);
+
+        if(!IsInMeleeRange())
         {
-            if (IsInMeleeRange()) break;
-            yield return null;
+            return false;
         }
-        _movementSpeed = movementSpeed;
-        _anim.speed = 1;
-        GoGoGOAP();
+        else{
+            _movementSpeed = movementSpeed;
+            _anim.speed = 1;
+            hasRun = false;
+            return true;
+        }
     }
 
     IEnumerator Forward()
@@ -392,17 +420,26 @@ public class ZombunnyEnemy : EntityMovement
         GoGoGOAP();
     }
 
-    IEnumerator Melee()
+    private bool Melee()
     {
-        SetMove(false);
-        Rotate();
-        _finishAnimation = false;
-        _anim.SetTrigger(StringTagManager.animAttack);
-        while (!_finishAnimation)
+        Action initial = () => {
+            SetMove(false);
+            Rotate();
+            _finishAnimation = false;
+            _anim.SetTrigger(StringTagManager.animAttack);
+        };
+        Debug.LogError(_finishAnimation);
+        RunOnceAction(initial);
+
+        if (_finishAnimation)
         {
-            yield return null;
+            hasRun = false;
+            return true;
         }
-        GoGoGOAP();
+        else
+        {
+            return false;
+        }
     }
 
     IEnumerator GetHealed()
@@ -535,6 +572,13 @@ public class ZombunnyEnemy : EntityMovement
             //_anim.SetBool(weapon.ToString(), false);
         }
         GetGOAPPlaning();
+    }
+
+    private void RunOnceAction(Action f)
+    {
+        if (hasRun) return;
+        f();
+        hasRun = true;
     }
     #endregion
 

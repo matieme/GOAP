@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using GameUtils;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : SingletonObject<PlayerHealth>
 {
     public int startingHealth = 100;
     public int currentHealth;
