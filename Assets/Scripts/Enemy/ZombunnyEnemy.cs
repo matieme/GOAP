@@ -187,6 +187,10 @@ public class ZombunnyEnemy : EntityMovement
     {
         concreteActions.Add(GOAPActionKeyEnum.Rush.ToString(), Rush);
         concreteActions.Add(GOAPActionKeyEnum.Melee.ToString(), Melee);
+        concreteActions.Add(GOAPActionKeyEnum.GrabBattery.ToString(), GrabBattery);
+        concreteActions.Add(GOAPActionKeyEnum.Reload.ToString(), Reload);
+        concreteActions.Add(GOAPActionKeyEnum.PositionToShoot.ToString(), PositionToShoot);
+        concreteActions.Add(GOAPActionKeyEnum.Shoot.ToString(), Shoot);
         return concreteActions;
     }
 
@@ -317,16 +321,18 @@ public class ZombunnyEnemy : EntityMovement
     private bool IsInShootingRange()
     {
         bool targetInSight = true;
-        Vector3 dirToTarget = _target.transform.position - transform.position;
-        RaycastHit[] rch;
-        rch = Physics.RaycastAll(transform.position, dirToTarget, enemyShooting.shootDistance);
-        for (int i = 0; i < rch.Length; i++)
+        if (_target != null)
         {
-            RaycastHit hit = rch[i];
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer(StringTagManager.maskShootable))
-                targetInSight = false;
+            Vector3 dirToTarget = _target.transform.position - transform.position;
+            RaycastHit[] rch;
+            rch = Physics.RaycastAll(transform.position, dirToTarget, enemyShooting.shootDistance);
+            for (int i = 0; i < rch.Length; i++)
+            {
+                RaycastHit hit = rch[i];
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer(StringTagManager.maskShootable))
+                    targetInSight = false;
+            }
         }
-
         return _target != null ? Vector3.Distance(_target.position, transform.position) <= enemyShooting.shootDistance && targetInSight: false;
     }
 
@@ -428,7 +434,7 @@ public class ZombunnyEnemy : EntityMovement
             _finishAnimation = false;
             _anim.SetTrigger(StringTagManager.animAttack);
         };
-        Debug.LogError(_finishAnimation);
+
         RunOnceAction(initial);
 
         if (_finishAnimation)
@@ -484,94 +490,117 @@ public class ZombunnyEnemy : EntityMovement
         GoGoGOAP();
     }
 
-    IEnumerator GrabBattery()
+    private bool GrabBattery()
     {
-        var batteries = BatteryManager.Instance.batteries;
-        batteries.OrderBy(x => Vector3.Distance(x.transform.position, transform.position));
-
-        if (batteries.Count > 0)
-        {
-            _closestBattery = batteries[0].transform;
-            var triggerSet = false;
-            SetTarget(_closestBattery);
-            SetMove(true);
-            Move();
-            _finishAnimation = false;
-
-            while (true)
+        Action initial = () => {
+            var batteries = BatteryManager.Instance.batteries;
+            batteries.OrderBy(x => Vector3.Distance(x.transform.position, transform.position));
+            if (batteries.Count > 0)
             {
-                if (IsInPickUpRange() && !_finishAnimation && !triggerSet)
-                {
-                    SetMove(false);
-                    StopMoving();
-                    AnimGrab();
-                    _anim.SetTrigger(StringTagManager.animPickUp);
-                    triggerSet = true;
-                }
-                else if (_finishAnimation)
-                {
-                    _anim.ResetTrigger(StringTagManager.animPickUp);
-                    break;
-                }
-                else if (_closestBattery == null)
-                {
-                    GetGOAPPlaning();
-                }
-                yield return null;
+                _closestBattery = batteries[0].transform;
+                SetTarget(_closestBattery);
+                SetMove(true);
+                Move();
+                _finishAnimation = false;
             }
+        };
+
+        RunOnceAction(initial);
+
+        if (IsInPickUpRange() && !_finishAnimation)
+        {
+            SetMove(false);
+            StopMoving();
+            AnimGrab();
+            _anim.SetTrigger(StringTagManager.animPickUp);
+            return false;
+        }
+        else if (_finishAnimation)
+        {
+            _anim.ResetTrigger(StringTagManager.animPickUp);
+            hasRun = false;
+            return true;
+        }
+        else if (_closestBattery == null)
+        {
+            GetGOAPPlaning();
+            hasRun = false;
+            return true;
         }
         else
         {
-            GetGOAPPlaning();
+            return false;
         }
 
-        GoGoGOAP();
     }
 
-    IEnumerator Reload()
+    private bool Reload()
     {
-        SetMove(false);
-        Rotate();
-        _finishAnimation = false;
-        _anim.SetTrigger(StringTagManager.animReload);
-
-        while (!_finishAnimation)
+        Action initial = () =>
         {
-            yield return null;
-        }
-        GoGoGOAP();
-    }
+            SetMove(false);
+            Rotate();
+            _finishAnimation = false;
+            _anim.SetTrigger(StringTagManager.animReload);
+        };
 
-    IEnumerator PositionToShoot()
-    {
-        SetTarget(_player);
-        SetMove(true);
-        Move();
-        while (true)
+        RunOnceAction(initial);
+
+        if(_finishAnimation)
         {
-            if (IsInShootingRange()) break;
-            yield return null;
+            hasRun = false;
+            return true;
         }
-        GetGOAPPlaning();
+        else
+        {
+            return false;
+        }
     }
 
-    IEnumerator Shoot()
+    private bool PositionToShoot()
     {
+        Action initial = () =>
+        {
+            SetTarget(_player);
+            SetMove(true);
+            Move();
+        };
+
+        RunOnceAction(initial);
+
         if(IsInShootingRange())
+        {
+            hasRun = false;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private bool Shoot()
+    {
+        Action initial = () =>
         {
             SetTarget(_player);
             Rotate();
             SetMove(false);
-            //_anim.SetBool(weapon.ToString(), true);
-            while (battery > 0 && _clipSizeMax > 0)
-            {
-                yield return null;
-            }
+        };
+
+        RunOnceAction(initial);
+
+        if(battery > 0 && _clipSizeMax > 0)
+        {
+            return false;
+        }
+        else
+        {
             isLaserLoaded = false;
             AnimShootLaser();
-            //_anim.SetBool(weapon.ToString(), false);
+            hasRun = false;
+            return true;
         }
-        GetGOAPPlaning();
     }
 
     private void RunOnceAction(Action f)
