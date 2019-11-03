@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: b77f122f451a2394898a24191c26107c
 ModelImporter:
-  serializedVersion: 18
+  serializedVersion: 23
   fileIDToRecycleName:
     100000: Ctrl_Grp
     100002: Hellephant
@@ -55,28 +55,47 @@ ModelImporter:
     7400000: Move
     7400002: Idle
     7400004: Death
+    7400006: Attack
     9500000: //RootNode
     13700000: Hellephant
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: EyesMaterial
+    second: {fileID: 2100000, guid: 51d14e0fd3936be48bf8d5031d3e24c7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: HellephantMaterial
+    second: {fileID: 2100000, guid: 20c2c861010d0ce49a4716087f02535e, type: 2}
   materials:
     importMaterials: 1
     materialName: 1
     materialSearch: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
+    resampleCurves: 1
     optimizeGameObjects: 1
     motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
     animationCompression: 1
-    animationRotationError: .5
-    animationPositionError: .5
-    animationScaleError: .5
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths:
     - Ctrl_Grp/Root/Hips/Spine1/Trunk1
+    extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
       name: Move
@@ -88,6 +107,7 @@ ModelImporter:
       level: 0
       cycleOffset: 0
       loop: 0
+      hasAdditiveReferencePose: 0
       loopTime: 1
       loopBlend: 1
       loopBlendOrientation: 0
@@ -152,6 +172,7 @@ ModelImporter:
         weight: 1
       maskType: 0
       maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     - serializedVersion: 16
       name: Idle
       takeName: Take 001
@@ -162,6 +183,7 @@ ModelImporter:
       level: 0
       cycleOffset: 0
       loop: 0
+      hasAdditiveReferencePose: 0
       loopTime: 1
       loopBlend: 1
       loopBlendOrientation: 0
@@ -226,6 +248,7 @@ ModelImporter:
         weight: 1
       maskType: 0
       maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     - serializedVersion: 16
       name: Death
       takeName: Take 001
@@ -236,6 +259,7 @@ ModelImporter:
       level: 0
       cycleOffset: 0
       loop: 0
+      hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
@@ -249,7 +273,7 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: .378486067
+      - time: 0.37848607
         functionName: StartSinking
         data: 
         objectReferenceParameter: {instanceID: 0}
@@ -307,43 +331,148 @@ ModelImporter:
         weight: 1
       maskType: 0
       maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Attack
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 25
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events:
+      - time: 0.6292373
+        functionName: AnimMeleeAttack
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.9470339
+        functionName: AnimFinishAnimation
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ctrl_Grp
+        weight: 1
+      - path: Ctrl_Grp/Root
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/LeftLeg
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/LeftLeg/LeftFoot
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/LeftLeg/LeftFoot/LeftFootEnd
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/RightLeg
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/RightLeg/RightFoot
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/RightLeg/RightFoot/RightFootEnd
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Spine2
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Spine2/LeftEar1
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Spine2/LeftEar1/LeftEar2
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Spine2/LeftEar1/LeftEar2/LeftEarEnd
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Spine2/RightEar1
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Spine2/RightEar1/RightEar2
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Spine2/RightEar1/RightEar2/RightEarEnd
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Spine2/SpineEnd
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Trunk1
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Trunk1/Trunk2
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Trunk1/Trunk2/Trunk3
+        weight: 1
+      - path: Ctrl_Grp/Root/Hips/Spine1/Trunk1/Trunk2/Trunk3/TrunkEnd
+        weight: 1
+      - path: Hellephant
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: .00999999978
+    globalScale: 0.01
     meshCompression: 0
     addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 0
     importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 0
+    previousCalculatedGlobalScale: 0.01
+    hasPreviousCalculatedGlobalScale: 1
   tangentSpace:
     normalSmoothAngle: 60
-    splitTangentsAcrossUV: 1
     normalImportMode: 0
-    tangentImportMode: 1
+    tangentImportMode: 4
+    normalCalculationMode: 0
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
+    serializedVersion: 2
     human: []
     skeleton: []
-    armTwist: .5
-    foreArmTwist: .5
-    upperLegTwist: .5
-    legTwist: .5
-    armStretch: .0500000007
-    legStretch: .0500000007
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
     feetSpacing: 0
     rootMotionBoneName: 
     hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 2
   humanoidOversampling: 1
