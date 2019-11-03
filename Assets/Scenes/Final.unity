@@ -22768,7 +22768,7 @@ PrefabInstance:
     - target: {fileID: 391163675217350532, guid: cbe386d4cf9336c4ba55cba51c3fa9cc,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.09
+      value: -4.71
       objectReference: {fileID: 0}
     - target: {fileID: 391163675217350532, guid: cbe386d4cf9336c4ba55cba51c3fa9cc,
         type: 3}
@@ -35476,6 +35476,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   adyacent: []
+--- !u!1 &530125889
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 530125891}
+  - component: {fileID: 530125890}
+  m_Layer: 0
+  m_Name: MediKits
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &530125890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530125889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fb4797c4f27cb447807dbe660c3158f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  medikits: []
+--- !u!4 &530125891
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530125889}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1296275958}
+  m_Father: {fileID: 0}
+  m_RootOrder: 15
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &530128237
 GameObject:
   m_ObjectHideFlags: 0
@@ -85199,6 +85244,81 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   adyacent: []
+--- !u!1001 &1296275957
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 530125891}
+    m_Modifications:
+    - target: {fileID: 2119265430974437176, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_Name
+      value: MedikitBox
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 43.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7ca4d82d62aa82749b3121a2a0d42df1, type: 3}
+--- !u!4 &1296275958 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4551338254263174846, guid: 7ca4d82d62aa82749b3121a2a0d42df1,
+    type: 3}
+  m_PrefabInstance: {fileID: 1296275957}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1297015360
 GameObject:
   m_ObjectHideFlags: 0
@@ -140636,6 +140756,26 @@ PrefabInstance:
     - target: {fileID: 214487225, guid: 77e47276124528d48bc1fa67f8884717, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 214487219, guid: 77e47276124528d48bc1fa67f8884717, type: 3}
+      propertyPath: criticalLifeAmount
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 214487219, guid: 77e47276124528d48bc1fa67f8884717, type: 3}
+      propertyPath: pickUpDistance
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 214487219, guid: 77e47276124528d48bc1fa67f8884717, type: 3}
+      propertyPath: _life
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 214487219, guid: 77e47276124528d48bc1fa67f8884717, type: 3}
+      propertyPath: startingHealth
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 214487219, guid: 77e47276124528d48bc1fa67f8884717, type: 3}
+      propertyPath: mediKitLayerMask.m_Bits
+      value: 65536
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 77e47276124528d48bc1fa67f8884717, type: 3}

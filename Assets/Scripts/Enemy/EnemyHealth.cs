@@ -5,6 +5,7 @@ using UnityEngine;
 public class EnemyHealth : EntityLife
 {
     public int startingHealth = 100;
+    public int criticalLifeAmount;
     public float sinkSpeed = 0.5f;
     public int scoreValue = 10;
     public AudioClip deathClip;
@@ -50,6 +51,10 @@ public class EnemyHealth : EntityLife
         }
     }
 
+    public bool IsInCriticalLife()
+    {
+        return criticalLifeAmount >= Life;
+    }
 
     void Death()
     {

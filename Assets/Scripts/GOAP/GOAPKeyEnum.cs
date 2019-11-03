@@ -9,5 +9,6 @@
     life,
     batteryNearby,
     medikitNearby,
-    playerIsAlive
+    playerIsAlive,
+    haveCriticalLife
 }

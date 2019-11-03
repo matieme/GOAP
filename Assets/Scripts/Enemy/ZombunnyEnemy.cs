@@ -67,7 +67,7 @@ public class ZombunnyEnemy : EntityMovement
     List<IGOAPAction> CreateActions()
     {
         var _availableActions = new List<IGOAPAction>();
-
+        
         _availableActions.Add(
             new GOAPAction(GOAPActionKeyEnum.Shoot)
                 .SetPrecondition(GOAPKeyEnum.isLaserLoaded, x => (bool)x == true)
@@ -87,34 +87,30 @@ public class ZombunnyEnemy : EntityMovement
                 .SetPrecondition(GOAPKeyEnum.battery, x => (int)x > 0)
                 .SetEffect(GOAPKeyEnum.isLaserLoaded, x => x = true)
                 .SetCost(1));
-
+                
         _availableActions.Add(
             new GOAPAction(GOAPActionKeyEnum.GrabBattery)
                 .SetPrecondition(GOAPKeyEnum.batteryNearby, x => (bool)x == true)
                 .SetEffect(GOAPKeyEnum.battery, x => x = (int)x + 1)
                 .SetCost(GetCostForBatteryNearby()));
-
+        
         _availableActions.Add(
             new GOAPAction(GOAPActionKeyEnum.Melee)
+                .SetPrecondition(GOAPKeyEnum.haveCriticalLife, x => (bool)x == false)
                 .SetPrecondition(GOAPKeyEnum.isInMeleeRange, x => (bool)x == true)
                 .SetEffect(GOAPKeyEnum.isAttacking, x => x = true)
                 .SetCost(50));
 
         _availableActions.Add(
             new GOAPAction(GOAPActionKeyEnum.Rush)
-                .SetPrecondition(GOAPKeyEnum.life, x => (float)x > 5)
+                .SetPrecondition(GOAPKeyEnum.haveCriticalLife, x => (bool)x == false)
                 .SetEffect(GOAPKeyEnum.isInMeleeRange, x => x = true)
                 .SetCost(Vector3.Distance(_player.position, transform.position)));
 
         _availableActions.Add(
-            new GOAPAction(GOAPActionKeyEnum.Forward)
-                .SetEffect(GOAPKeyEnum.isInMeleeRange, x => x = true)
-                .SetCost(Vector3.Distance(_player.position, transform.position) + 5));
-
-        _availableActions.Add(
             new GOAPAction(GOAPActionKeyEnum.GetHealed)
                 .SetPrecondition(GOAPKeyEnum.medikitNearby, x => (bool)x == true)
-                .SetEffect(GOAPKeyEnum.life, x => x = (float)x + 20)
+                .SetEffect(GOAPKeyEnum.haveCriticalLife, x => x = false)
                 .SetCost(GetCostForMedikitNearby()));
 
         return _availableActions;
@@ -135,11 +131,11 @@ public class ZombunnyEnemy : EntityMovement
             { GOAPKeyEnum.isInWeaponRange , IsInShootingRange() },
             { GOAPKeyEnum.batteryNearby , IsBatteryNearby() },
             { GOAPKeyEnum.medikitNearby , IsMedikitNearby() },
-            { GOAPKeyEnum.playerIsAlive , IsPlayerAlive() }
+            { GOAPKeyEnum.playerIsAlive , IsPlayerAlive() },
+            { GOAPKeyEnum.haveCriticalLife , IsInCriticalLife() }
         };
         var goal = new Map<GOAPKeyEnum, Func<object, bool>>() {
             { GOAPKeyEnum.isAttacking , x => (bool) x == true},
-            { GOAPKeyEnum.playerIsAlive , x => (bool) x == true}
         };
 
         var plan = new GOAPPlan(actions, initialState, goal, heuristic);
@@ -179,6 +175,7 @@ public class ZombunnyEnemy : EntityMovement
         if (state.goalValues.ContainsKey(GOAPKeyEnum.medikitNearby)) total += (bool)state.currentValues[GOAPKeyEnum.medikitNearby] ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.battery)) total += (int)state.currentValues[GOAPKeyEnum.battery] > 0 ? 0 : 1;
         if (state.goalValues.ContainsKey(GOAPKeyEnum.life)) total += (float)state.currentValues[GOAPKeyEnum.life] > 5 ? 0 : 1;
+        if (state.goalValues.ContainsKey(GOAPKeyEnum.haveCriticalLife)) total += (bool)state.currentValues[GOAPKeyEnum.haveCriticalLife] ? 0 : 1;
 
         return total;
     }
@@ -191,6 +188,7 @@ public class ZombunnyEnemy : EntityMovement
         concreteActions.Add(GOAPActionKeyEnum.Reload.ToString(), Reload);
         concreteActions.Add(GOAPActionKeyEnum.PositionToShoot.ToString(), PositionToShoot);
         concreteActions.Add(GOAPActionKeyEnum.Shoot.ToString(), Shoot);
+        concreteActions.Add(GOAPActionKeyEnum.GetHealed.ToString(), GetHealed);
         return concreteActions;
     }
 
@@ -282,14 +280,6 @@ public class ZombunnyEnemy : EntityMovement
     public void Rotate()
     {
         transform.LookAt(_target);
-        /*
-        var vec = _target.transform.position - transform.position;
-        vec.Normalize();
-        Quaternion quack = Quaternion.LookRotation(vec);
-        quack.x = 0;
-        quack.z = 0;
-        _rg.MoveRotation(Quaternion.RotateTowards(transform.rotation, quack, rotationSpeed * Time.fixedDeltaTime));    
-        */
     }
 
     private void SetMove(bool value)
@@ -338,7 +328,7 @@ public class ZombunnyEnemy : EntityMovement
 
     private bool IsInPickUpRange()
     {
-        return _target != null ? Vector3.Distance(_target.position, transform.position) <= 1 : false;
+        return _target != null ? Vector3.Distance(_target.position, transform.position) <= 2.3f : false;
     }
 
     private bool IsBatteryNearby()
@@ -392,10 +382,10 @@ public class ZombunnyEnemy : EntityMovement
     private bool Rush()
     {
         Action initial = () => {
+            SetTarget(_player);
             Move();
             _movementSpeed = rushingSpeed;
             _anim.speed = 1.7f;
-            SetTarget(_player);
             SetMove(true);
         };
 
@@ -411,19 +401,6 @@ public class ZombunnyEnemy : EntityMovement
             hasRun = false;
             return true;
         }
-    }
-
-    IEnumerator Forward()
-    {
-        _movementSpeed = movementSpeed;
-        SetTarget(_player);
-        SetMove(true);
-        while (true)
-        {
-            if (IsInMeleeRange()) break;
-            yield return null;
-        }
-        GoGoGOAP();
     }
 
     private bool Melee()
@@ -448,46 +425,47 @@ public class ZombunnyEnemy : EntityMovement
         }
     }
 
-    IEnumerator GetHealed()
+    private bool GetHealed()
     {
-        var mediKitBoxes = Physics.OverlapSphere(transform.position, pickUpDistance, mediKitLayerMask, QueryTriggerInteraction.Collide);
-        mediKitBoxes.OrderBy(x => Vector3.Distance(x.transform.position, transform.position));
-
-        if (mediKitBoxes.Length > 0)
-        {
-            _closestMediKit = mediKitBoxes[0].transform;
-            var triggerSet = false;
-            SetTarget(_closestMediKit);
-            SetMove(true);
-            _finishAnimation = false;
-
-            while (true)
+        Action initial = () => {
+            var mediKitBoxes = MedikitManager.Instance.medikits;
+            mediKitBoxes.OrderBy(x => Vector3.Distance(x.transform.position, transform.position));
+            if (mediKitBoxes.Count > 0)
             {
-                if (IsInPickUpRange() && !_finishAnimation && !triggerSet)
-                {
-                    SetMove(false);
-                    _anim.SetTrigger(StringTagManager.animPickUp);
-                    triggerSet = true;
-                }
-                else if (_finishAnimation)
-                {
-                    _anim.ResetTrigger(StringTagManager.animPickUp);
-                    break;
-                }
-                else if (_closestMediKit == null)
-                {
-                    GetGOAPPlaning();
-                }
-                yield return null;
+                _closestMediKit = mediKitBoxes[0].transform;
+                SetTarget(_closestMediKit);
+                SetMove(true);
+                Move();
+                _finishAnimation = false;
             }
+        };
+
+        RunOnceAction(initial);
+
+        if (IsInPickUpRange() && !_finishAnimation)
+        {
+            SetMove(false);
+            StopMoving();
+            AnimGrab();
+            _anim.SetTrigger(StringTagManager.animPickUp);
+            return false;
+        }
+        else if (_finishAnimation)
+        {
+            _anim.ResetTrigger(StringTagManager.animPickUp);
+            hasRun = false;
+            return true;
+        }
+        else if (_closestMediKit == null)
+        {
+            GetGOAPPlaning();
+            hasRun = false;
+            return true;
         }
         else
         {
-            GetGOAPPlaning();
+            return false;
         }
-
-
-        GoGoGOAP();
     }
 
     private bool GrabBattery()

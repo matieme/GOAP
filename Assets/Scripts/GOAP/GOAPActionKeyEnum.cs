@@ -4,7 +4,6 @@
     PositionToShoot,
     Melee,
     Rush,
-    Forward,
     Reload,
     GrabBattery,
     GetHealed
